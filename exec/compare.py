@@ -75,16 +75,18 @@ def get_object_type(obj) -> int:
     for num, tp in zip((4, 3, 2, 1), (THnSparse, TH3, TH2, TH1)):
         if isinstance(obj, tp):
             return num
+        #print(f"Object {obj.GetName()} is not {tp}")
     return 0
 
 
-def are_same_histograms(his1: TH1, his2: TH1) -> bool:
+def are_same_histograms(his1: TH1, his2: TH1, outside_range = True) -> bool:
     """Tell whether two histograms are same."""
+    outside_range = False
     if not are_valid(his1, his2):
         msg_fatal("Bad input objects")
         return False
     # Compare number of entries
-    if his1.GetEntries() != his2.GetEntries():
+    if outside_range and his1.GetEntries() != his2.GetEntries():
         print(f"Different number of entries {his1.GetEntries()} vs {his2.GetEntries()}")
         return False
     # Compare axes
@@ -96,13 +98,19 @@ def are_same_histograms(his1: TH1, his2: TH1) -> bool:
             return False
     # Compare bin counts and errors (include under/overflow bins)
     for bin_z in range(his1.GetNbinsZ() + 2):
+        if not outside_range and bin_z in (0, his1.GetNbinsZ() + 1):
+            continue
         for bin_y in range(his1.GetNbinsY() + 2):
+            if not outside_range and bin_y in (0, his1.GetNbinsY() + 1):
+                continue
             for bin_x in range(his1.GetNbinsX() + 2):
+                if not outside_range and bin_x in (0, his1.GetNbinsX() + 1):
+                    continue
                 bin = his1.GetBin(bin_x, bin_y, bin_z)
                 if his1.GetBinContent(bin) != his2.GetBinContent(bin) or his1.GetBinError(bin) != his2.GetBinError(bin):
                     print(
                         f"Different bin {bin} content: {his1.GetBinContent(bin)} ± {his1.GetBinError(bin)} vs "
-                        "{his2.GetBinContent(bin)} ± {his2.GetBinError(bin)}"
+                        f"{his2.GetBinContent(bin)} ± {his2.GetBinError(bin)}"
                     )
                     return False
     return True
@@ -177,7 +185,7 @@ def are_same_objects(obj1, obj2) -> bool:
     type_obj = list_type[0]
     # Compare supported ROOT objects
     if type_obj == 0:
-        msg_fatal(f"Objects have an unsupported type {type(obj1)}.")
+        msg_err(f"Objects have an unsupported type {type(obj1)}.")
         return False
     # elif type_obj == 5:
     #     return are_same_response(obj1, obj2)
@@ -196,17 +204,24 @@ def compare(dict_obj, add_leg_title=True, normalize=True):
 
     # Explicit comparison
     list_files = list(dict_obj.keys())
+    #print(list_files)
     name_file_0 = list_files[0]
     name_file_1 = list_files[1]
+    #print(f"objects {dict_obj[name_file_0]}")
     for key_obj in dict_obj[name_file_0]:
         obj_0 = dict_obj[name_file_0][key_obj]
         obj_1 = dict_obj[name_file_1][key_obj]
         name_his = obj_0.GetName()
+        if get_object_type(obj_0) == 0:
+            # print(f"Type {type(obj_0)} of {obj_0.GetName()} is not supported")
+            continue
         if are_same_objects(obj_0, obj_1):
             print(f"Objects {name_his} are same {obj_0.GetEntries()}")
         else:
             print(f"Objects {name_his} are different")
+            # break
 
+    return []
     for key_file in dict_obj:
         print("Entry", len(dict_colors), key_file)
         dict_colors[key_file] = TColor.GetColor(list_colors[len(dict_colors)])
@@ -221,6 +236,8 @@ def compare(dict_obj, add_leg_title=True, normalize=True):
             obj = dict_obj[key_file][key_obj]
             # FIXME
             if "TDirectory" in obj.ClassName():
+                continue
+            if get_object_type(obj) == 0:
                 continue
             opt = "LP"
             if dict_list_canvas.setdefault(key_obj, None) is None:
@@ -273,8 +290,9 @@ def compare(dict_obj, add_leg_title=True, normalize=True):
     return dict_list_canvas
 
 
-def main(files, th1=True, th2=False, th3=False):
+def main(files, th1=True, th2=True, th3=True):
     gROOT.SetBatch(True)
+    print(files)
     list_files = [TFile(i) for i in files]
     dict_obj = {}
 
@@ -289,34 +307,46 @@ def main(files, th1=True, th2=False, th3=False):
             return True
 
         list_names = []
-        print(f"Directory {directory.GetName()}")
-        for key in directory.GetListOfKeys():
-            obj = directory.Get(key.GetName())
-            if not accept_obj(obj):
-                continue
-            if "TDirectory" in obj.ClassName():
-                for key_sub in obj.GetListOfKeys():
-                    if not accept_obj(obj.Get(key_sub.GetName())):
-                        continue
-                    list_names.append(f"{directory.GetName()}/{key.GetName()}/{key_sub.GetName()}")
-                continue
-            list_names.append(f"{directory.GetName()}/{key.GetName()}")
+        #print(f"Object {directory.GetName()}")
+        if "TDirectory" in directory.ClassName():
+            for key in directory.GetListOfKeys():
+                obj = directory.Get(key.GetName())
+                if not accept_obj(obj):
+                    continue
+                if "TDirectory" in obj.ClassName():
+                    for key_sub in obj.GetListOfKeys():
+                        if not accept_obj(obj.Get(key_sub.GetName())):
+                            continue
+                        list_names.append(f"{directory.GetName()}/{key.GetName()}/{key_sub.GetName()}")
+                    continue
+                list_names.append(f"{directory.GetName()}/{key.GetName()}")
+        elif "TH" in directory.ClassName():
+            if accept_obj(directory):
+                list_names.append(directory.GetName())
+        else:
+            print(f"Could not process {directory.GetName()}")
         return list_names
 
     for file in list_files:
         name_file = file.GetName()
         name_file = name_file.replace(".root", "")
         name_file = name_file.replace("AnalysisResults_O2_Run5_", "")
-        name_file = name_file.split("/")[-1]
+        # name_file = name_file.split("/")[-1]
         dict_obj[name_file] = {}
         list_keys = file.GetListOfKeys()
         for key in list_keys:
+            # print(f"Key {key}")
             # h[fn] = list(itertools.chain(*extract(i.Get(j.GetName()))))
             list_obj_names = extract(file.Get(key.GetName()))
+            #print(f"list_obj_names {list_obj_names}")
             for name_obj in list_obj_names:
+                #print(f"Getting {name_obj}")
                 dict_obj[name_file][name_obj] = file.Get(name_obj)
+    #print(f"dict_obj {dict_obj}")
     dict_list_canvas = compare(dict_obj, normalize=False)
     first = True
+    can_first = None
+    #print(dict_list_canvas)
     for key_obj in dict_list_canvas:
         can = dict_list_canvas[key_obj][0]
         can_rat = dict_list_canvas[key_obj][1]
@@ -327,7 +357,8 @@ def main(files, th1=True, th2=False, th3=False):
             first = False
         can.SaveAs("Comparison.pdf")
         can_rat.SaveAs("Comparison.pdf")
-    can_first.SaveAs("Comparison.pdf]")
+    if can_first:
+        can_first.SaveAs("Comparison.pdf]")
     # file_out = TFile("Comparison.root", "RECREATE")
     # for key_obj in dict_list_canvas:
     #     can = dict_list_canvas[key_obj][0]
