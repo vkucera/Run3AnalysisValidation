@@ -7896,7 +7896,7 @@
                 "24",
                 "36"
             ]
-         },
+        },
         "efficiencyFlagD": "0",
         "multMin": "0",
         "multMax": "1000",
@@ -7917,7 +7917,7 @@
                 "16",
                 "24"
             ]
-         },
+        },
         "signalRegionInner": {
             "values": [
                 "1.810",
@@ -7929,7 +7929,7 @@
                 "1.810",
                 "1.810"
             ]
-         },
+        },
         "signalRegionOuter": {
             "values": [
                 "1.922",
@@ -7941,7 +7941,7 @@
                 "1.922",
                 "1.922"
             ]
-         },
+        },
         "sidebandLeftInner": {
             "values": [
                 "1.642",
@@ -7953,7 +7953,7 @@
                 "1.642",
                 "1.642"
             ]
-         },
+        },
         "sidebandLeftOuter": {
             "values": [
                 "1.754",
@@ -7965,7 +7965,7 @@
                 "1.754",
                 "1.754"
             ]
-         },
+        },
         "sidebandRightInner": {
             "values": [
                 "1.978",
@@ -7977,7 +7977,7 @@
                 "1.978",
                 "1.978"
             ]
-         },
+        },
         "sidebandRightOuter": {
             "values": [
                 "2.090",
@@ -7989,7 +7989,7 @@
                 "2.090",
                 "2.090"
             ]
-         },
+        },
         "efficiencyFlagD": "0",
         "processData": "true",
         "processMcRec": "false",
@@ -8156,7 +8156,7 @@
         "DoTriggering": "false",
         "jetAreaFractionMin": "-99",
         "jetPtBinWidth": "5",
-        "fillTHnSparse": "false",
+        "fillTHnSparse": "true",
         "jetExtraParam": "-99",
         "processDummy": "false",
         "processChargedJetsData": "true",

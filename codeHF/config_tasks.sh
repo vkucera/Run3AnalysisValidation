@@ -35,7 +35,7 @@ MAKE_PERF_STATS=0            # Produce performance profiling stats.
 
 # Activation of O2 workflows
 # Trigger selection
-DOO2_TRIGSEL=0      # event-selection
+DOO2_TRIGSEL=1      # event-selection
 # Vertexing
 DOO2_SKIM=0         # hf-track-index-skim-creator
 DOO2_CAND_2PRONG=0  # hf-candidate-creator-2prong
@@ -113,7 +113,7 @@ DOO2_CORR_DSHADRON=0           # hf-correlator-ds-hadrons
 DOO2_TASK_D0HADRON=0           # hf-task-correlation-d0-hadrons
 DOO2_TASK_FLOW=0               # hf-task-flow
 # Jets
-DOO2_JET_FIND=0     # je-jet-finder-d0
+DOO2_JET_FIND=1     # je-jet-finder-d0
 DOO2_JET_FIND_QA=0  # je-jet-finder-d0-qa
 DOO2_JET_MATCH=0    # je-jet-matching-mc-d0-ch
 DOO2_JET_SUB=0      # je-jet-substructure-d0
