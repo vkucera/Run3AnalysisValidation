@@ -1,9 +1,9 @@
 ---
 ## aliBuild configuration template (default values used if absent) ##
 aliBuild: # optional
-#   dir_alice: "$HOME/alice" # build directory with repositories of aliBuild packages
-#   architecture: "" # system architecture, automatically determined by aliBuild if empty or absent
-#   options: "" # aliBuild command line options
+  # dir_alice: "$HOME/alice" # build directory with repositories of aliBuild packages
+  # architecture: "" # system architecture, automatically determined by aliBuild if empty or absent
+  # options: "" # aliBuild command line options
   clean: 1 # Run aliBuild clean at the end.
   clean_aggressive: 1 # Use the '--aggressive-cleanup' option.
   clean_purge: 1 # Keep only the latest builds and delete the rest.
@@ -52,14 +52,9 @@ repositories:
     update: 1
     origin: "origin"
 
-  ALICE3_HFperformance:
+  MachineLearningHEP:
     update: 1
-    branch: "main"
-
-  megalinter:
-    update: 1
-    path: "$HOME/megalinter"
-    branch: "main"
+    branch: "run3"
     origin: "origin"
 
   analysis-framework:
@@ -70,7 +65,16 @@ repositories:
     update: 1
     origin: "origin"
 
-  MachineLearningHEP:
+  ALICE3_HFperformance:
     update: 1
-    branch: "run3"
+    branch: "main"
+
+  megalinter:
+    update: 1
+    path: "$HOME/projects/megalinter"
+    branch: "main"
     origin: "origin"
+
+  massif-visualizer:
+    update: 1
+    path: "$HOME/projects/massif-visualizer"
