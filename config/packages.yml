@@ -20,22 +20,50 @@ repositories:
   #   build: 0 # Build the package with aliBuild. Absent by default. If present, package is considered in the cleanup.
   #   build_opt: "--defaults o2" # aliBuild command line options, absent by default
 
-  alice-analysis-tutorial:
-    update: 1
-
-  ali-bot:
-    update: 1
+  # Infrastructure
 
   alibuild:
-    update: 1
-
-  alibuild-recipe-tools:
     update: 1
 
   alidist:
     update: 1
 
+  ali-bot:
+    update: 1
+
+  ci-jobs:
+    update: 1
+
+  homebrew-system-deps:
+    update: 1
+
+  alibuild-recipe-tools:
+    update: 1
+
+  docks:
+    update: 1
+
   alidistlint:
+    update: 1
+
+  # Packages
+
+  O2:
+    update: 1
+    branch: dev
+
+  O2Physics:
+    update: 1
+
+  O2DPG:
+    update: 1
+
+  Run3AnalysisValidation:
+    update: 1
+
+  # Docs
+
+  alice-analysis-tutorial:
     update: 1
 
   alisw-github-io:
@@ -47,30 +75,11 @@ repositories:
   analysis-tutorials:
     update: 1
 
-  ci-jobs:
-    update: 1
-
   CodingGuidelines:
     update: 1
-
-  docks:
-    update: 1
-
-  homebrew-system-deps:
-    update: 1
-
-  O2:
-    update: 1
-    branch: dev
 
   O2-wiki:
     update: 1
 
-  O2Physics:
-    update: 1
-
   O2Physics-wiki:
-    update: 1
-
-  Run3AnalysisValidation:
     update: 1
