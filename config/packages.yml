@@ -46,6 +46,9 @@ repositories:
   alidistlint:
     update: 1
 
+  O2CodeChecker:
+    update: 1
+
   # Packages
 
   O2:
