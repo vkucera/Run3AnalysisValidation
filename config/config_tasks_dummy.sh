@@ -75,7 +75,7 @@ function AdjustJson {
 
   # Derived AO2D input
   if [ "$INPUT_PARENT_MASK" ]; then
-    ReplaceString "PARENT_PATH_MASK" "$INPUT_PARENT_MASK" "$JSON" || ErrExit "Failed to edit $JSON."
+    ReplaceString "PARENT_PATH_MASK;" "$INPUT_PARENT_MASK" "$JSON" || ErrExit "Failed to edit $JSON."
   fi
 
   # Collision system

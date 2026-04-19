@@ -61,10 +61,10 @@ DOO2_SEL_DSTAR=0    # hf-candidate-selector-dstar
 DOO2_SEL_TOXIPI=0   # hf-candidate-selector-to-xi-pi
 DOO2_SEL_XIC_XIPIPI=0   # hf-candidate-selector-xic-to-xi-pi-pi
 # Analysis tasks
-DOO2_TASK_D0=1      # hf-task-d0
+DOO2_TASK_D0=0      # hf-task-d0
 DOO2_TASK_DS=0      # hf-task-ds
 DOO2_TASK_DPLUS=0   # hf-task-dplus
-DOO2_TASK_LC=1      # hf-task-lc
+DOO2_TASK_LC=0      # hf-task-lc
 DOO2_TASK_LB=0      # hf-task-lb
 DOO2_TASK_XIC=0     # hf-task-xic
 DOO2_TASK_LCK0SP=0  # hf-task-lc-to-k0s-p
@@ -100,12 +100,15 @@ DOO2_CORR_DPLUSHADRON=0        # hf-correlator-dplus-hadrons
 DOO2_CORR_DSHADRON=0           # hf-correlator-ds-hadrons
 DOO2_TASK_D0HADRON=0           # hf-task-correlation-d0-hadrons
 DOO2_TASK_FLOW=0               # hf-task-flow
-# Jets
-DOO2_JET_FIND=0     # je-jet-finder-d0
-DOO2_JET_FIND_QA=0  # je-jet-finder-d0-qa
-DOO2_JET_MATCH=0    # je-jet-matching-mc-d0-ch
-DOO2_JET_SUB=0      # je-jet-substructure-d0
-DOO2_JET_SUB_OUT=0  # je-jet-substructure-d0-output
+# HF jets
+HF_WF="lc"           # HF-jet-tagging hadron ("d0", "lc")
+DOO2_JET_FIND_INC=1  # je-jet-finder-...
+DOO2_JET_FIND=0      # je-jet-finder-HF-...
+DOO2_JET_FIND_QA=0   # je-jet-finder-HF-qa
+DOO2_JET_MATCH=0     # je-jet-matching-mc-HF-ch
+DOO2_JET_SUB=0       # je-jet-substructure-HF
+DOO2_JET_SUB_OUT=1   # je-jet-substructure-HF-output
+DOO2_JET_LUM_CALC=1  # je-jet-luminosity-calculator
 # QA
 DOO2_QA_EFF=0       # qa-efficiency
 DOO2_QA_EVTRK=0     # qa-event-track
@@ -140,10 +143,26 @@ APPLYCUTS_LCK0SP=1  # Apply Λc → K0S p selection cuts.
 APPLYCUTS_B0=1      # Apply B0 selection cuts.
 APPLYCUTS_BPLUS=1   # Apply B+ selection cuts.
 
-SAVETREES=0         # Save O2 tables to trees.
+SAVETREES=1         # Save O2 tables to trees.
 USEO2VERTEXER=1     # Use the O2 vertexer in AliPhysics.
 USEALIEVCUTS=1      # Use AliEventCuts in AliPhysics (as used by conversion task)
 DORATIO=1           # Plot histogram ratios in comparison.
+
+# HF-jet-tagging hadron replacement masks
+HF_WF_MASK="#HF_WF#"
+HF_DECAY_MASK="#HF_DECAY#"
+HF_TABLE_MASK="_HF_TABLE_"
+
+case $HF_WF in
+  "d0")
+    HF_WF="d0"
+    HF_TABLE="D0"
+    HF_DECAY="d0-to-k-pi";;
+  "lc")
+    HF_WF="lc"
+    HF_TABLE="LC"
+    HF_DECAY="lc-to-p-k-pi";;
+esac
 
 ####################################################################################################
 
@@ -299,6 +318,8 @@ function AdjustJson {
   ReplaceString "\"processDummy_mcd\"" "\"processDummy\"" "$JSON" || ErrExit "Failed to edit $JSON."
   ReplaceString "\"processDummy_mcp\"" "\"processDummy\"" "$JSON" || ErrExit "Failed to edit $JSON."
 
+  # HF jets
+
   # Enable D0 selection.
   if [ $APPLYCUTS_D0 -eq 1 ]; then
     MsgWarn "Using D0 selection cuts"
@@ -445,17 +466,20 @@ function MakeScriptO2 {
   [ $DOO2_TASK_FLOW -eq 1 ] && WORKFLOWS+=" o2-analysis-hf-task-flow"
   # Jets
   if [ "$INPUT_IS_MC" -eq 1 ]; then
-    [ $DOO2_JET_FIND -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-finder-d0-mcd-charged o2-analysis-je-jet-finder-d0-mcp-charged"
-    [ $DOO2_JET_FIND_QA -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-finder-d0-qa_mc"
-    [ $DOO2_JET_SUB -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-substructure-d0_mc"
-    [ $DOO2_JET_SUB_OUT -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-substructure-d0-output_mc"
+    [ $DOO2_JET_FIND_INC -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-finder-mcd-charged o2-analysis-je-jet-finder-mcp-charged"
+    [ $DOO2_JET_FIND -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-finder-${HF_WF}-mcd-charged o2-analysis-je-jet-finder-${HF_WF}-mcp-charged"
+    [ $DOO2_JET_FIND_QA -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-finder-${HF_WF}-qa_mc"
+    [ $DOO2_JET_SUB -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-substructure-${HF_WF}_mc"
+    [ $DOO2_JET_SUB_OUT -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-substructure-${HF_WF}-output_mc"
   else
-    [ $DOO2_JET_FIND -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-finder-d0-data-charged"
-    [ $DOO2_JET_FIND_QA -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-finder-d0-qa_data"
-    [ $DOO2_JET_SUB -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-substructure-d0_data"
-    [ $DOO2_JET_SUB_OUT -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-substructure-d0-output_data"
+    [ $DOO2_JET_FIND_INC -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-finder-data-charged"
+    [ $DOO2_JET_FIND -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-finder-${HF_WF}-data-charged"
+    [ $DOO2_JET_FIND_QA -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-finder-${HF_WF}-qa_data"
+    [ $DOO2_JET_SUB -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-substructure-${HF_WF}_data"
+    [ $DOO2_JET_SUB_OUT -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-substructure-${HF_WF}-output_data"
   fi
-  [ $DOO2_JET_MATCH -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-matching-mc-d0-ch"
+  [ $DOO2_JET_LUM_CALC -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-luminosity-calculator"
+  [ $DOO2_JET_MATCH -eq 1 ] && WORKFLOWS+=" o2-analysis-je-jet-matching-mc-${HF_WF}-ch"
   # QA
   [ $DOO2_QA_EFF -eq 1 ] && WORKFLOWS+=" o2-analysis-qa-efficiency"
   [ $DOO2_QA_EVTRK -eq 1 ] && WORKFLOWS+=" o2-analysis-qa-event-track"
@@ -495,9 +519,13 @@ function MakeScriptO2 {
   ReplaceString "$SUFFIX_RUN_MASK" "$SUFFIX_RUN" "$DATABASE_O2" || ErrExit "Failed to edit $DATABASE_O2."
   ReplaceString "$SUFFIX_SKIM_MASK" "$SUFFIX_SKIM" "$DATABASE_O2" || ErrExit "Failed to edit $DATABASE_O2."
   ReplaceString "$SUFFIX_DER_MASK" "$SUFFIX_DER" "$DATABASE_O2" || ErrExit "Failed to edit $DATABASE_O2."
+  ReplaceString "$HF_WF_MASK" "$HF_WF" "$DATABASE_O2" || ErrExit "Failed to edit $DATABASE_O2."
+  ReplaceString "$HF_TABLE_MASK" "$HF_TABLE" "$DATABASE_O2" || ErrExit "Failed to edit $DATABASE_O2."
+  ReplaceString "$HF_DECAY_MASK" "$HF_DECAY" "$DATABASE_O2" || ErrExit "Failed to edit $DATABASE_O2."
+
   # Derived AO2D input
   if [ "$INPUT_PARENT_MASK" ]; then
-    ReplaceString "PARENT_PATH_MASK" "$INPUT_PARENT_MASK" "$DATABASE_O2" || ErrExit "Failed to edit $DATABASE_O2."
+    ReplaceString "PARENT_PATH_MASK;" "$INPUT_PARENT_MASK" "$DATABASE_O2" || ErrExit "Failed to edit $DATABASE_O2."
   fi
 
   # Generate the O2 command.

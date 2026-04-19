@@ -4,9 +4,9 @@
 # Input specification for run_analysis.sh
 # (Modifies input parameters.)
 
-INPUT_CASE=7            # Input case
+INPUT_CASE=17            # Input case
 
-NFILESMAX=1             # Maximum number of processed input files. (Set to -0 to process all; to -N to process all but the last N files.)
+NFILESMAX=-0             # Maximum number of processed input files. (Set to -0 to process all; to -N to process all but the last N files.)
 
 # Number of input files per job. (Will be automatically optimised if set to 0.)
 NFILESPERJOB_CONVERT=0  # Conversion
@@ -14,7 +14,7 @@ NFILESPERJOB_ALI=0      # AliPhysics
 NFILESPERJOB_O2=1       # O2
 
 # Maximum number of simultaneously running O2 jobs. (Adjust it based on available memory.)
-NJOBSPARALLEL_O2=$(python3 -c "print(min(10, round($(nproc) / 2)))")
+# NJOBSPARALLEL_O2=$(python3 -c "print(min(10, round($(nproc) / 2)))")
 
 # Default settings:
 # INPUT_LABEL="nothing"           # Input description
@@ -141,5 +141,10 @@ case $INPUT_CASE in
     INPUT_DIR="$INPUT_BASE/Run3/pp_13.6TeV/sim/LHC24d3"
     INPUT_IS_MC=1
     INPUT_TASK_CONFIG="DOO2_CONV_MCCOLL=1 DOO2_CONV_TRKEX_1_2=1"
+    ;;
+  17)
+    INPUT_LABEL="Run 3, p-p 13.6 TeV, LHC22o_pass7"
+    INPUT_DIR="/data2/MLhep/trains/633725"
+    JSON="dpl-config_hfj.json"
     ;;
   esac

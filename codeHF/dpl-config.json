@@ -6094,7 +6094,7 @@
         "processMcSig": "false",
         "ptMaxForDownSample": "10"
     },
-    "hf-derived-data-creator-lc-to-p-k-pi": {
+    "hf-derived-data-creator-lc-to-k0s-p": {
         "downSampleBkgFactor": "1",
         "fillCandidateBase": "true",
         "fillCandidateId": "true",
@@ -6119,7 +6119,7 @@
         "processMcSig": "false",
         "ptMaxForDownSample": "10"
     },
-    "hf-derived-data-creator-lc-to-k0s-p": {
+    "hf-derived-data-creator-lc-to-p-k-pi": {
         "downSampleBkgFactor": "1",
         "fillCandidateBase": "true",
         "fillCandidateId": "true",
@@ -8334,55 +8334,7 @@
         "processV0MC": "false",
         "processWithoutEMCalCollisionLabels": "false"
     },
-    "jet-finder-charged-d0-qa": {
-        "centralityMax": "999",
-        "centralityMin": "-999",
-        "eventSelections": "sel8",
-        "jetAreaFractionMin": "-99",
-        "jetEtaMax": "99",
-        "jetEtaMin": "-99",
-        "jetPtMax": "200",
-        "jetRadii": {
-            "values": [
-                "0.4"
-            ]
-        },
-        "leadingConstituentPtMin": "-99",
-        "pTHatExponent": "6",
-        "pTHatMaxMCD": "999",
-        "pTHatMaxMCP": "999",
-        "processCandidates": "false",
-        "processDummy": "false",
-        "processEvtWiseConstSubJetsData": "false",
-        "processHFTriggeredData": "false",
-        "processJetsData": "false",
-        "processJetsMCD": "true",
-        "processJetsMCDWeighted": "false",
-        "processJetsMCP": "true",
-        "processJetsMCPMCDMatched": "false",
-        "processJetsMCPMCDMatchedWeighted": "false",
-        "processJetsMCPWeighted": "false",
-        "processJetsRhoAreaSubData": "false",
-        "processJetsRhoAreaSubMCD": "false",
-        "processJetsSubMatched": "false",
-        "processMCCollisionsWeighted": "false",
-        "processRandomConeData": "false",
-        "processRandomConeMCD": "false",
-        "processRho": "false",
-        "processTracks": "false",
-        "processTracksSub": "false",
-        "processTracksWeighted": "false",
-        "processTriggeredData": "false",
-        "randomConeR": "0.4",
-        "selectedJetsRadius": "0.4",
-        "trackEtaMax": "0.9",
-        "trackEtaMin": "-0.9",
-        "trackPtMax": "100",
-        "trackPtMin": "0.15",
-        "trackSelections": "globalTracks",
-        "vertexZCut": "10"
-    },
-    "jet-finder-d0-data-charged": {
+    "jet-finder-#HF#-data-charged": {
         "DoTriggering": "false",
         "applyTrackingEfficiency": "false",
         "candPtMax": "100",
@@ -8456,7 +8408,55 @@
         "triggerMasks": "",
         "vertexZCut": "10"
     },
-    "jet-matching-mc-d0-ch": {
+    "jet-finder-charged-#HF#-qa": {
+        "centralityMax": "999",
+        "centralityMin": "-999",
+        "eventSelections": "sel8",
+        "jetAreaFractionMin": "-99",
+        "jetEtaMax": "99",
+        "jetEtaMin": "-99",
+        "jetPtMax": "200",
+        "jetRadii": {
+            "values": [
+                "0.4"
+            ]
+        },
+        "leadingConstituentPtMin": "-99",
+        "pTHatExponent": "6",
+        "pTHatMaxMCD": "999",
+        "pTHatMaxMCP": "999",
+        "processCandidates": "false",
+        "processDummy": "false",
+        "processEvtWiseConstSubJetsData": "false",
+        "processHFTriggeredData": "false",
+        "processJetsData": "false",
+        "processJetsMCD": "true",
+        "processJetsMCDWeighted": "false",
+        "processJetsMCP": "true",
+        "processJetsMCPMCDMatched": "false",
+        "processJetsMCPMCDMatchedWeighted": "false",
+        "processJetsMCPWeighted": "false",
+        "processJetsRhoAreaSubData": "false",
+        "processJetsRhoAreaSubMCD": "false",
+        "processJetsSubMatched": "false",
+        "processMCCollisionsWeighted": "false",
+        "processRandomConeData": "false",
+        "processRandomConeMCD": "false",
+        "processRho": "false",
+        "processTracks": "false",
+        "processTracksSub": "false",
+        "processTracksWeighted": "false",
+        "processTriggeredData": "false",
+        "randomConeR": "0.4",
+        "selectedJetsRadius": "0.4",
+        "trackEtaMax": "0.9",
+        "trackEtaMin": "-0.9",
+        "trackPtMax": "100",
+        "trackPtMin": "0.15",
+        "trackSelections": "globalTracks",
+        "vertexZCut": "10"
+    },
+    "jet-matching-mc-#HF#-ch": {
         "doMatchingGeo": "true",
         "doMatchingHf": "true",
         "doMatchingPt": "true",
@@ -8465,7 +8465,7 @@
         "processDummy": "false",
         "processJets": "true"
     },
-    "jet-substructure-d0": {
+    "jet-substructure-#HF#": {
         "alpha": "1",
         "applyTrackingEfficiency": "false",
         "beta": "0",
@@ -8492,7 +8492,7 @@
         },
         "zCut": "0.1"
     },
-    "jet-substructure-d0-output": {
+    "jet-substructure-#HF#-output": {
         "jetEtaMax": "99",
         "jetEtaMin": "-99",
         "jetPtMinData": "0",

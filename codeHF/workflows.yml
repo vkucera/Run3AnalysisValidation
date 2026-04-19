@@ -3,7 +3,7 @@ options:
   global: # used once at the end of the command
     - "--aod-memory-rate-limit 2000000000"
     - "--shm-segment-size 16000000000"
-    - "--aod-parent-base-path-replacement \"PARENT_PATH_MASK\""
+    - "--aod-parent-base-path-replacement \"PARENT_PATH_MASK;\""
     - "--aod-parent-access-level 1"
     - "--resources-monitoring 2"
     - "--aod-file \"@list_o2.txt\""
@@ -494,63 +494,82 @@ workflows:
   o2-analysis-hf-pid-creator:
     dependencies: [o2-analysis-pid-tpc_runX, o2-analysis-pid-tof_runX]
 
-  # Jets
+  #Jets
 
   o2-analysis-je-jet-deriveddata-producer: {}
+    # dependencies: o2-analysis-hf-derived-data-creator-#HF_DECAY#
 
   o2-analysis-je-estimator-rho: {}
+    # dependencies:
+      # - o2-analysis-je-jet-deriveddata-producer
+      # - o2-analysis-hf-derived-data-creator-#HF_DECAY#
 
-  o2-analysis-je-jet-finder-d0-data-charged: &jethf
+  o2-analysis-je-jet-finder-data-charged:
+    # dependencies: o2-analysis-je-jet-deriveddata-producer
+    tables: ["CEWSJET", "CEWSJETC", "CJET", "CJETC"]
+
+  o2-analysis-je-jet-finder-#HF_WF#-data-charged: &jethf
+    # dependencies: o2-analysis-je-jet-deriveddata-producer
+    tables: [_HF_TABLE_JET, _HF_TABLE_JETCONSTS, _HF_TABLE_JETCONSTSUB]
+
+  o2-analysis-je-jet-finder-#HF_WF#-mcd-charged:
+    <<: *jethf
+    requires_mc: yes
+    tables: [_HF_TABLE_DJET, _HF_TABLE_DJETCONSTS, _HF_TABLE_DJETCONSTSUB]
+
+  o2-analysis-je-jet-finder-#HF_WF#-mcp-charged:
+    <<: *jethf
+    requires_mc: yes
+    tables: [_HF_TABLE_PJET, _HF_TABLE_PJETCONSTS, _HF_TABLE_PJETCONSTSUB]
+
+  o2-analysis-je-jet-finder-#HF_WF#-qa_data:
+    executable: o2-analysis-je-jet-finder-#HF_WF#-qa
+    dependencies: o2-analysis-je-jet-finder-#HF_WF#-data-charged
+
+  o2-analysis-je-jet-finder-#HF_WF#-qa_mc:
+    executable: o2-analysis-je-jet-finder-#HF_WF#-qa
+    dependencies: [o2-analysis-je-jet-finder-#HF_WF#-mcd-charged, o2-analysis-je-jet-finder-#HF_WF#-mcp-charged]
+    requires_mc: yes
+
+  o2-analysis-je-jet-matching-mc-#HF_WF#-ch:
+    dependencies: [o2-analysis-je-jet-finder-#HF_WF#-mcd-charged, o2-analysis-je-jet-finder-#HF_WF#-mcp-charged]
+    requires_mc: yes
+    tables: [_HF_TABLE_JETMP2D, _HF_TABLE_JETMD2P]
+
+  o2-analysis-je-jet-substructure-#HF_WF#_data:
+    executable: o2-analysis-je-jet-substructure-#HF_WF#
     dependencies:
-      - o2-analysis-hf-derived-data-creator-d0-to-k-pi
-      - o2-analysis-je-jet-deriveddata-producer
-    tables: [D0JET, D0JETCONSTS, D0JETCONSTSUB]
+      # - o2-analysis-hf-candidate-selector-#HF_DECAY#
+      - o2-analysis-je-jet-finder-#HF_WF#-data-charged
+    tables: _HF_TABLE_SS
 
-  o2-analysis-je-jet-finder-d0-mcd-charged:
-    <<: *jethf
+  o2-analysis-je-jet-substructure-#HF_WF#_mc:
+    executable: o2-analysis-je-jet-substructure-#HF_WF#
+    dependencies: [o2-analysis-hf-candidate-selector-#HF_DECAY#, o2-analysis-je-jet-finder-#HF_WF#-mcd-charged, o2-analysis-je-jet-finder-#HF_WF#-mcp-charged]
     requires_mc: yes
-    tables: [D0DJET, D0DJETCONSTS, D0DJETCONSTSUB]
+    tables: [_HF_TABLE_MCDSS, _HF_TABLE_MCPSS]
 
-  o2-analysis-je-jet-finder-d0-mcp-charged:
-    <<: *jethf
+  o2-analysis-je-jet-substructure-#HF_WF#-output_data:
+    executable: o2-analysis-je-jet-substructure-#HF_WF#-output
+    dependencies:
+      - o2-analysis-je-jet-substructure-#HF_WF#_data
+      - o2-analysis-je-estimator-rho
+      # - o2-analysis-je-jet-deriveddata-producer
+      # - o2-analysis-hf-derived-data-creator-#HF_DECAY#
+    tables: [AOD/_HF_TABLE_CJETCO, AOD/_HF_TABLE_CJETO, AOD/_HF_TABLE_CJETSSO, AOD1/HF_HF_TABLE_SEL, AOD1/HF_HF_TABLE_BASE, AOD1/HF_HF_TABLE_COLLBASE, AOD1/HF_HF_TABLE_ML, AOD/_HF_TABLE_CJETRO]
+
+  o2-analysis-je-jet-substructure-#HF_WF#-output_mc:
+    executable: o2-analysis-je-jet-substructure-#HF_WF#-output
+    dependencies: o2-analysis-je-jet-substructure-#HF_WF#_mc
     requires_mc: yes
-    tables: [D0PJET, D0PJETCONSTS, D0PJETCONSTSUB]
+    tables: [_HF_TABLE_MCDO, _HF_TABLE_MCDSSO, _HF_TABLE_MCPO, _HF_TABLE_MCPSSO]
 
-  o2-analysis-je-jet-finder-d0-qa_data:
-    executable: o2-analysis-je-jet-finder-d0-qa
-    dependencies: o2-analysis-je-jet-finder-d0-data-charged
+  o2-analysis-je-jet-luminosity-producer:
+    # dependencies: o2-analysis-je-jet-deriveddata-producer
+    tables: [AOD1/BCCOUNT, AOD1/COLLCOUNT]
 
-  o2-analysis-je-jet-finder-d0-qa_mc:
-    executable: o2-analysis-je-jet-finder-d0-qa
-    dependencies: [o2-analysis-je-jet-finder-d0-mcd-charged, o2-analysis-je-jet-finder-d0-mcp-charged]
-    requires_mc: yes
-
-  o2-analysis-je-jet-matching-mc-d0-ch:
-    dependencies: [o2-analysis-je-jet-finder-d0-mcd-charged, o2-analysis-je-jet-finder-d0-mcp-charged]
-    requires_mc: yes
-    tables: [D0JETMP2D, D0JETMD2P]
-
-  o2-analysis-je-jet-substructure-d0_data:
-    executable: o2-analysis-je-jet-substructure-d0
-    dependencies: [o2-analysis-hf-candidate-selector-d0, o2-analysis-je-jet-finder-d0-data-charged]
-    tables: D0SS
-
-  o2-analysis-je-jet-substructure-d0_mc:
-    executable: o2-analysis-je-jet-substructure-d0
-    dependencies: [o2-analysis-hf-candidate-selector-d0, o2-analysis-je-jet-finder-d0-mcd-charged, o2-analysis-je-jet-finder-d0-mcp-charged]
-    requires_mc: yes
-    tables: [D0MCDSS, D0MCPSS]
-
-  o2-analysis-je-jet-substructure-d0-output_data:
-    executable: o2-analysis-je-jet-substructure-d0-output
-    dependencies: [o2-analysis-je-jet-substructure-d0_data, o2-analysis-je-estimator-rho]
-    tables: [D0O, D0SSO]
-
-  o2-analysis-je-jet-substructure-d0-output_mc:
-    executable: o2-analysis-je-jet-substructure-d0-output
-    dependencies: o2-analysis-je-jet-substructure-d0_mc
-    requires_mc: yes
-    tables: [D0MCDO, D0MCDSSO, D0MCPO, D0MCPSSO]
+  o2-analysis-je-jet-luminosity-calculator:
+    dependencies: o2-analysis-je-jet-luminosity-producer
 
   # QA
 
